@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   polled_camera
   nodelet
+  cv_bridge
 )
 
 #Get architecture
@@ -29,7 +30,7 @@ generate_dynamic_reconfigure_options(
 
 catkin_package(
   INCLUDE_DIRS include
-  CATKIN_DEPENDS camera_info_manager diagnostic_updater dynamic_reconfigure image_geometry image_transport roscpp sensor_msgs std_msgs polled_camera
+  CATKIN_DEPENDS camera_info_manager diagnostic_updater dynamic_reconfigure image_geometry image_transport roscpp sensor_msgs std_msgs polled_camera cv_bridge
 )
 
 ###########
@@ -107,6 +108,15 @@ add_executable(stereo_camera_node
 
 add_dependencies_and_linkings(stereo_camera_node)
 
+add_executable(opencv_camera_node
+  src/nodes/opencv_camera_node.cpp
+  src/opencv_camera.cpp
+  src/avt_vimba_camera.cpp
+  src/frame_observer.cpp
+)
+
+add_dependencies_and_linkings(opencv_camera_node)
+
 add_executable(sync_node
   src/nodes/sync_node.cpp
   src/sync.cpp
@@ -116,6 +126,7 @@ add_dependencies_and_linkings(sync_node)
 
 add_library(avt_camera_nodelets
   src/nodes/mono_camera_nodelet.cpp
+  src/nodes/opencv_camera_nodelet.cpp
   src/nodes/stereo_camera_nodelet.cpp
   src/stereo_camera.cpp
   src/avt_vimba_camera.cpp
@@ -127,7 +138,7 @@ add_dependencies_and_linkings(avt_camera_nodelets)
 #############
 
 ## Mark executables and/or libraries for installation
-install(TARGETS mono_camera_node stereo_camera_node avt_camera_nodelets
+install(TARGETS mono_camera_node opencv_camera_node stereo_camera_node avt_camera_nodelets
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -145,6 +156,8 @@ install(FILES
   plugins.xml
   launch/mono_camera.launch
   launch/mono_camera_nodelet.launch
+  launch/opencv_camera.launch
+  launch/opencv_camera_nodelet.launch
   launch/stereo_camera_one_node.launch
   launch/stereo_camera_two_nodes.launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
